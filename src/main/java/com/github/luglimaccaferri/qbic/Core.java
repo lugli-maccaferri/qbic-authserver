@@ -76,12 +76,13 @@ public class Core {
                 // con l'utente root viene anche generata la chiave privata (magari troviamo un metodo migliore per detectare l'installazione)
                 System.out.println("===== IMPORTANT =====");
                 System.out.printf("generating '%s' as root user%n", rootUserUsername);
+                String rootUserPass = RandomString.generateAlphanumeric(20);
 
-                User root = generateRootUser(rootUserUsername);
+                User root = generateRootUser(rootUserUsername, rootUserPass);
 
                 System.out.printf(
                         "generated root user '%s' identified by %s and with UUID %s%n"
-                        , root.getUsername(), root.getHash(), root.getUUID());
+                        , root.getUsername(), rootUserPass, root.getUUID());
                 System.out.println("save this info a$ap because you won't see this message ever again!");
                 System.out.println("generating private/public key pair...");
 
@@ -117,12 +118,11 @@ public class Core {
 
     }
 
-    User generateRootUser(String rootUserUsername) throws ExistingUserException, ExecutionException, InterruptedException {
+    User generateRootUser(String rootUserUsername, String rootUserPassword) throws ExistingUserException, ExecutionException, InterruptedException {
 
 
         String rootUserUUID = UUID.randomUUID().toString();
-        String rootUserPass = RandomString.generateAlphanumeric(20); // stringa crittograficamente sicura (SecureRandom)
-        User createdUser = User.createInstance(rootUserUUID, rootUserUsername, rootUserPass, true);
+        User createdUser = User.createInstance(rootUserUUID, rootUserUsername, rootUserPassword, true);
 
         return createdUser;
 

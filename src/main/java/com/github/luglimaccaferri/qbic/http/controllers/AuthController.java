@@ -19,10 +19,11 @@ public class AuthController {
                 password = req.queryParams("password");
 
         User user = User.from(username);
+
         if(user == null) return HTTPError.INVALID_CREDENTIALS.toResponse(res);
         if(!user.verifyPassword(password)) return HTTPError.INVALID_CREDENTIALS.toResponse(res);
 
-        return new Ok().toResponse(res);
+        return new Ok().put("username", user.getUsername()).toResponse(res);
 
     };
 
