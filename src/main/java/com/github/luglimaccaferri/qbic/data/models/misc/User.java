@@ -8,9 +8,9 @@ import com.github.luglimaccaferri.qbic.data.mysql.Connector;
 import com.github.luglimaccaferri.qbic.errors.users.ExistingUserException;
 import com.github.luglimaccaferri.qbic.utils.Security;
 
-import javax.management.Query;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -20,10 +20,10 @@ public class User {
     protected final UUID uuid;
     protected String username;
     protected String hash;
-    protected final HashMap<String, Boolean> permissions = new HashMap<String, Boolean>();
+    protected final HashMap<String, Byte> permissions = new HashMap<String, Byte>();
 
     public User(UUID uuid){ this.uuid = uuid; }
-    private User(String uuid, String username, String password, boolean isAdmin, boolean editFs, boolean editOthers){
+    private User(String uuid, String username, String password, byte isAdmin, byte editFs, byte editOthers){
         this.uuid = UUID.fromString(uuid);
         this.username = username;
         this.hash = password;
@@ -40,11 +40,12 @@ public class User {
 
         RowData result = query.get().getRows().get(0);
 
+        System.out.println(result.get("admin"));
         this.username = String.valueOf(result.get("username"));
         this.hash = String.valueOf(result.get("password"));
-        this.permissions.put("admin", "1".equals(result.get("admin")));
-        this.permissions.put("edit_fs", "1".equals(result.get("edit_fs")));
-        this.permissions.put("edit_others", "1".equals(result.get("edit_others")));
+        this.permissions.put("admin", (Byte) result.get("admin"));
+        this.permissions.put("edit_fs", (Byte) result.get("edit_fs"));
+        this.permissions.put("edit_others", (Byte) result.get("edit_others"));
 
         return this;
 
@@ -52,17 +53,17 @@ public class User {
 
     public String getUsername() { return this.username; }
     public String getHash(){ return this.hash; }
-    public HashMap<String, Boolean> getPermissions(){ return this.permissions; }
+    public HashMap<String, Byte> getPermissions(){ return this.permissions; }
     public UUID getUUID(){ return this.uuid; }
-    public boolean isAdmin(){ return this.permissions.get("admin"); }
+    public Byte isAdmin(){ return this.permissions.get("admin"); }
 
     public boolean verifyPassword(String password){ return BCrypt.verifyer().verify(password.toCharArray(), this.hash).verified; }
 
-    public static User createInstance(String uuid, String username, String password, boolean isAdmin) throws ExecutionException, InterruptedException, ExistingUserException {
-        return User.createInstance(uuid, username, password, isAdmin, true, true);
+    public static User createInstance(String uuid, String username, String password, byte isAdmin) throws ExecutionException, InterruptedException, ExistingUserException {
+        return User.createInstance(uuid, username, password, isAdmin, (byte) 1, (byte) 1);
     }
 
-    public static User createInstance(String uuid, String username, String password, boolean isAdmin, boolean editFs, boolean editOthers) throws ExecutionException, InterruptedException {
+    public static User createInstance(String uuid, String username, String password, byte isAdmin, byte editFs, byte editOthers) throws ExecutionException, InterruptedException {
 
         String hashed = Security.hashPassword(password);
         CompletableFuture<QueryResult> query = Connector.connection.sendPreparedStatement(
@@ -98,9 +99,9 @@ public class User {
                 String.valueOf(
                         result.get("password")
                 ),
-                "1".equals(result.get("admin")),
-                "1".equals(result.get("edit_fs")),
-                "1".equals(result.get("edit_others"))
+                (Byte) Objects.requireNonNull(result.get("admin")),
+                (Byte) Objects.requireNonNull(result.get("edit_fs")),
+                (Byte) Objects.requireNonNull(result.get("edit_others"))
         );
 
     }

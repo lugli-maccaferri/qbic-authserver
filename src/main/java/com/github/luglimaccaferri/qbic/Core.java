@@ -7,11 +7,14 @@ import com.github.luglimaccaferri.qbic.data.mysql.Connector;
 import com.github.luglimaccaferri.qbic.errors.users.ExistingUserException;
 import com.github.luglimaccaferri.qbic.http.Router;
 import com.github.luglimaccaferri.qbic.utils.RandomString;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
+import javax.json.Json;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -87,7 +90,7 @@ public class Core {
                 System.out.println("generating private/public key pair...");
 
                 generatePrivatePublicPair();
-                System.out.printf("dumped RSA key pair at %s", KEYS_PATH);
+                System.out.printf("dumped RSA key pair at %s%n", KEYS_PATH);
                 System.out.println("==========");
 
             }else System.out.println("skipping root user creation...");
@@ -103,7 +106,6 @@ public class Core {
             );
 
             this.router.ignite();
-
             this.initialized = true;
             System.out.println("qbic has been successfully started!");
 
@@ -120,11 +122,8 @@ public class Core {
 
     User generateRootUser(String rootUserUsername, String rootUserPassword) throws ExistingUserException, ExecutionException, InterruptedException {
 
-
         String rootUserUUID = UUID.randomUUID().toString();
-        User createdUser = User.createInstance(rootUserUUID, rootUserUsername, rootUserPassword, true);
-
-        return createdUser;
+        return User.createInstance(rootUserUUID, rootUserUsername, rootUserPassword, (byte) 1);
 
     }
 

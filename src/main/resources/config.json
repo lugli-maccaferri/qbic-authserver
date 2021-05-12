@@ -1,4 +1,5 @@
 {
+  "jwt_timeout": 7200,
   "mysql": {
     "host": "localhost",
     "username": "qbic_user",
