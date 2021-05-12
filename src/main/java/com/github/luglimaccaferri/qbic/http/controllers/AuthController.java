@@ -2,7 +2,7 @@ package com.github.luglimaccaferri.qbic.http.controllers;
 
 import com.github.luglimaccaferri.qbic.http.models.HTTPError;
 import com.github.luglimaccaferri.qbic.http.models.Ok;
-import com.github.luglimaccaferri.qbic.http.models.misc.User;
+import com.github.luglimaccaferri.qbic.data.models.misc.User;
 import spark.Route;
 
 public class AuthController {

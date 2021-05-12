@@ -1,4 +1,4 @@
-package com.github.luglimaccaferri.qbic.http.models.misc;
+package com.github.luglimaccaferri.qbic.data.models.misc;
 
 import java.util.UUID;
 

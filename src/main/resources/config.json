@@ -5,5 +5,8 @@
     "password": "qbic_pass",
     "database": "qbic",
     "port": 3306
+  },
+  "nodes": {
+
   }
 }
