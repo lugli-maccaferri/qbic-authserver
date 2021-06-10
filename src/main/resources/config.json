@@ -7,7 +7,10 @@
     "database": "qbic",
     "port": 3306
   },
-  "nodes": {
-
-  }
+  "nodes": [
+    {
+      "name": "mc1",
+      "host": "http://10.0.0.3"
+    }
+  ]
 }

@@ -7,22 +7,18 @@ import com.github.luglimaccaferri.qbic.data.mysql.Connector;
 import com.github.luglimaccaferri.qbic.errors.users.ExistingUserException;
 import com.github.luglimaccaferri.qbic.http.Router;
 import com.github.luglimaccaferri.qbic.utils.RandomString;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
-
-import javax.json.Json;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.http.HttpClient;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Objects;
 import java.util.UUID;
@@ -32,7 +28,7 @@ public class Core {
 
     private final Router router;
     private static JsonObject config;
-    private static Connector mysqlConnector = null;
+    private final static HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
     public static final Logger logger = Log.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
     private boolean initialized = false;
 
@@ -51,6 +47,7 @@ public class Core {
     }
 
     public static JsonObject getConfig(){ return config; }
+    public static HttpClient getHttpClient() { return httpClient; }
 
     public void init(){
 
@@ -69,7 +66,7 @@ public class Core {
                 );
 
             config = (JsonObject) JsonParser.parseReader(new FileReader(CONFIG_PATH));
-            mysqlConnector = Connector.connect(config.getAsJsonObject("mysql"));
+            Connector mysqlConnector = Connector.connect(config.getAsJsonObject("mysql"));
 
             String rootUserUsername = (String) CliParser.options.get("root-user").value();
             User rootUser = User.from(rootUserUsername);
@@ -93,7 +90,7 @@ public class Core {
                 System.out.printf("dumped RSA key pair at %s%n", KEYS_PATH);
                 System.out.println("==========");
 
-            }else System.out.println("skipping root user creation...");
+            } else System.out.println("skipping root user creation...");
 
             byte[] publicBytes = Files.readAllBytes(Path.of(KEYS_PATH + "/public.key"));
             byte[] privateBytes = Files.readAllBytes(Path.of(KEYS_PATH + "/private.key"));

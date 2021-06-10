@@ -1,6 +1,5 @@
 package com.github.luglimaccaferri.qbic;
 import com.github.luglimaccaferri.qbic.data.cli.CliParser;
-import com.github.luglimaccaferri.qbic.http.Router;
 
 public class Qbic{
 
