@@ -9,12 +9,12 @@ import com.github.luglimaccaferri.qbic.http.Router;
 import com.github.luglimaccaferri.qbic.utils.RandomString;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import okhttp3.OkHttpClient;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.http.HttpClient;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.*;
@@ -23,12 +23,13 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class Core {
 
     private final Router router;
     private static JsonObject config;
-    private final static HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
+    private final static OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(5, TimeUnit.SECONDS).build();
     public static final Logger logger = Log.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
     private boolean initialized = false;
 
@@ -47,7 +48,7 @@ public class Core {
     }
 
     public static JsonObject getConfig(){ return config; }
-    public static HttpClient getHttpClient() { return httpClient; }
+    public static OkHttpClient getHttpClient() { return httpClient; }
 
     public void init(){
 
