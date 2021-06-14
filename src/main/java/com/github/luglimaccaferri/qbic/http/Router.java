@@ -12,6 +12,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 import java.io.IOException;
+import java.net.NoRouteToHostException;
 import java.util.concurrent.CompletableFuture;
 
 import static com.github.luglimaccaferri.qbic.http.models.ProtectedRoute.route;
@@ -69,20 +70,23 @@ public class Router {
 
             JsonObject obj = node.getAsJsonObject();
             String host = obj.get("host").getAsString();
+            String url = String.format("%s/auth/public-key", host);
+
+            System.out.printf("broadcasting to %s%n", url);
+
             RequestBody body =  new FormBody.Builder()
                     .add("public-key", Security.bytesToHex(Core.KEYS.getPublic().getEncoded())).
                     build();
             Request request = new Request.Builder()
-                    .url(
-                            String.format("%s/auth/public-key", host)
-                    )
+                    .url(url)
                     .post(body)
                     .build();
 
             try {
-                Core.getHttpClient().newCall(request).execute();
+                Core.getHttpClient().newCall(request).execute().close();
             } catch (IOException e) {
-                e.printStackTrace();
+                if(e instanceof NoRouteToHostException) System.out.println("no route to host?");
+                else e.printStackTrace();
             }
 
         });
