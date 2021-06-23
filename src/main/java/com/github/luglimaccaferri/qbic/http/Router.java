@@ -2,6 +2,7 @@ package com.github.luglimaccaferri.qbic.http;
 
 import com.github.luglimaccaferri.qbic.Core;
 import com.github.luglimaccaferri.qbic.http.controllers.AuthController;
+import com.github.luglimaccaferri.qbic.http.controllers.NodesController;
 import com.github.luglimaccaferri.qbic.http.models.HTTPError;
 import com.github.luglimaccaferri.qbic.http.models.Ok;
 import com.github.luglimaccaferri.qbic.utils.Security;
@@ -46,6 +47,8 @@ public class Router {
             return Ok.SUCCESS.toResponse(res);
         });
         route(true).get("/auth", AuthController.index);
+
+        get("/nodes", NodesController.index);
 
         // derived paths
 
