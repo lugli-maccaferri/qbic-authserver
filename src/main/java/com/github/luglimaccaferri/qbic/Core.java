@@ -87,11 +87,12 @@ public class Core {
                 System.out.println("save this info a$ap because you won't see this message ever again!");
                 System.out.println("generating private/public key pair...");
 
-                generatePrivatePublicPair();
                 System.out.printf("dumped RSA key pair at %s%n", KEYS_PATH);
                 System.out.println("==========");
 
             } else System.out.println("skipping root user creation...");
+
+            generatePrivatePublicPair();
 
             byte[] publicBytes = Files.readAllBytes(Path.of(KEYS_PATH + "/public.key"));
             byte[] privateBytes = Files.readAllBytes(Path.of(KEYS_PATH + "/private.key"));
@@ -127,21 +128,25 @@ public class Core {
 
     void generatePrivatePublicPair() throws IOException, NoSuchAlgorithmException {
 
-        Files.deleteIfExists(Path.of(KEYS_PATH + "/public.key"));
-        Files.deleteIfExists(Path.of(KEYS_PATH + "/private.key"));
+        if(!Files.exists(Path.of(KEYS_PATH)))
+            Files.createDirectory(Path.of(KEYS_PATH));
+        
+        if(!Files.exists(Path.of(KEYS_PATH + "/public.key")) || !Files.exists(Path.of(KEYS_PATH + "/private.key"))){
 
-        // 2048 bit key per ridere
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-        kpg.initialize(2048); // magari custom
-        KeyPair kp = kpg.generateKeyPair();
-        Key publicKey = kp.getPublic(),
-            privateKey = kp.getPrivate();
+            // 2048 bit key per ridere
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+            kpg.initialize(2048); // magari custom
+            KeyPair kp = kpg.generateKeyPair();
+            Key publicKey = kp.getPublic(),
+                    privateKey = kp.getPrivate();
 
-        FileOutputStream writer = new FileOutputStream(KEYS_PATH + "/public.key");
-        writer.write(publicKey.getEncoded());
-        writer = new FileOutputStream(KEYS_PATH + "/private.key");
-        writer.write(privateKey.getEncoded());
-        writer.close();
+            FileOutputStream writer = new FileOutputStream(KEYS_PATH + "/public.key");
+            writer.write(publicKey.getEncoded());
+            writer = new FileOutputStream(KEYS_PATH + "/private.key");
+            writer.write(privateKey.getEncoded());
+            writer.close();
+
+        }
 
         return;
 
