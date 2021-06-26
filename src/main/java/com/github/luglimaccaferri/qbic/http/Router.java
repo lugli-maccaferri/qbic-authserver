@@ -56,6 +56,8 @@ public class Router {
             route(new String[]{"username", "password"}).post("/login", AuthController.login);
         });
 
+        get("*", (req, res) -> HTTPError.NOT_FOUND.toResponse(res));
+
         exception(HTTPError.class, (e, req, res) -> {
             res.status(e.getErrorCode());
             res.body(e.print());

@@ -22,6 +22,7 @@ public class HTTPError extends Exception implements JSONResponse{
     }
 
     public static final HTTPError BAD_REQUEST = new HTTPError("bad_request", 400);
+    public static final HTTPError NOT_FOUND = new HTTPError("not_found", 404);
     public static final HTTPError INVALID_CREDENTIALS = new HTTPError("invalid_credentials", 401);
 
     public String toResponse(Response response){
