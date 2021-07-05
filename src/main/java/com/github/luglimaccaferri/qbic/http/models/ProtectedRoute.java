@@ -1,5 +1,6 @@
 package com.github.luglimaccaferri.qbic.http.models;
 
+import com.google.gson.JsonObject;
 import spark.Route;
 import xyz.luan.spark.decorator.RouteDecorator;
 
@@ -38,6 +39,8 @@ public class ProtectedRoute extends RouteDecorator {
     protected Route before() {
         return (req, res) -> {
 
+            JsonObject body = req.attribute("parsed-body");
+
             if(this.requiresAuth){
                 String authHeader = req.headers("authorization");
                 if(authHeader == null) throw HTTPError.INVALID_CREDENTIALS;
@@ -47,7 +50,8 @@ public class ProtectedRoute extends RouteDecorator {
 
                 ArrayList<String> missingParameters = new ArrayList<String>();
                 Arrays.stream(this.requiredParams).forEach(param -> {
-                    if(req.queryParams(param) == null) missingParameters.add(param);
+                    String p = body.get(param).getAsString();
+                    if(p == null || p.equals("")) missingParameters.add(param);
                 });
 
                 if(missingParameters.size() > 0){

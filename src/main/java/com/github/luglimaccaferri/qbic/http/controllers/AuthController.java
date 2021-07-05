@@ -7,6 +7,7 @@ import com.github.luglimaccaferri.qbic.http.models.HTTPError;
 import com.github.luglimaccaferri.qbic.http.models.Ok;
 import com.github.luglimaccaferri.qbic.data.models.misc.User;
 import com.github.luglimaccaferri.qbic.utils.Security;
+import com.google.gson.JsonObject;
 import spark.Route;
 
 import java.security.interfaces.RSAPrivateKey;
@@ -24,8 +25,9 @@ public class AuthController {
 
     public static Route login = (req, res) -> {
 
-        String username = req.queryParams("username"),
-                password = req.queryParams("password");
+        JsonObject body = req.attribute("parsed-body");
+        String username = body.get("username").getAsString(),
+                password = body.get("password").getAsString();
 
         User user = User.from(username);
         HashMap<String, String> payload = new HashMap<String, String>(); // non posso usare Object perché il tipo deve essere conosciuto
