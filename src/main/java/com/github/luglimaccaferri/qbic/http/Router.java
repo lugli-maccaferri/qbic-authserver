@@ -9,6 +9,7 @@ import com.github.luglimaccaferri.qbic.utils.Security;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.MalformedJsonException;
 import okhttp3.FormBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -30,20 +31,25 @@ public class Router {
         CompletableFuture.runAsync(this::broadcastPublicKey);
 
         before((req, res) -> {
+            try{
+                res.header("Access-Control-Allow-Origin", "http://localhost:8080"); // debug da togliere in prod
+                res.header("Access-Control-Allow-Headers", "*"); // debug
+                res.header("Access-Control-Allow-Credentials", "true");
+                res.type("application/json");
+                req.attribute("parsed-body", JsonParser.parseString(req.body()));
 
-            res.header("Access-Control-Allow-Origin", "http://localhost:8080"); // debug da togliere in prod
-            res.header("Access-Control-Allow-Headers", "*"); // debug
-            res.header("Access-Control-Allow-Credentials", "true");
-            res.type("application/json");
-            req.attribute("parsed-body", JsonParser.parseString(req.body()));
+                String contentType = req.headers("Content-Type");
+                String requestMethod = req.requestMethod();
+                String url = req.url();
 
-            String contentType = req.headers("Content-Type");
-            String requestMethod = req.requestMethod();
-            String url = req.url();
+                Core.logger.warn(requestMethod + " " + url);
+                Core.logger.warn(contentType);
+            }catch(Exception e){
 
-            Core.logger.warn(requestMethod + " " + url);
-            Core.logger.warn(contentType);
+                if(e.getCause() instanceof MalformedJsonException) throw HTTPError.MALFORMED_BODY;
+                throw HTTPError.GENERIC_ERROR;
 
+            }
         });
 
         options("/*", (req, res) -> {
